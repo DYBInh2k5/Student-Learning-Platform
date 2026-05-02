@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: student-platform-db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - student-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: student-platform-api
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/student-platform
+      JWT_SECRET: your_super_secret_jwt_key
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:5000
+    depends_on:
+      - mongodb
+    networks:
+      - student-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: student-platform-web
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000/api
+      NEXT_PUBLIC_SOCKET_URL: http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - student-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  student-network:
+    driver: bridge

@@ -1,0 +1,13 @@
+{
+  "name": "student-learning-platform",
+  "version": "1.0.0",
+  "description": "Educational social network platform for programming students",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "te
