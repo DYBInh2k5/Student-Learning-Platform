@@ -9,8 +9,16 @@ A full-stack educational social network platform where students can learn progra
 - 🎯 **Exercises** - Practice problem-solving with real-time code execution
 - 💬 **Social Features** - Post updates, comment on posts, and build community
 - 💌 **Real-time Messaging** - Send instant messages with Socket.io
+- 🔔 **Real-time Notifications** - Instant push notifications for all events (new in v2.0)
 - 🏆 **Gamification** - Earn points and badges for achievements
 - 👥 **User Management** - Profiles, follower system, role-based access
+
+**✨ NEW in v2.0:**
+- 🔴 **Live Notifications** - Socket.IO-based real-time event delivery
+- 📊 **Automated Testing** - Postman collection + Newman CLI
+- 🚀 **CI/CD Pipeline** - GitHub Actions with auto-deploy to Vercel
+- ☁️ **Production Ready** - Vercel + Supabase configurations included
+- 🛠️ **Dev Tools** - In-memory MongoDB fallback, migration helpers
 
 ## Tech Stack
 
@@ -125,33 +133,104 @@ mongod
 
 **Terminal 1 - Backend:**
 ```bash
-cd backend
-npm run dev
-# Server runs on http://localhost:5000
+npm run dev:backend
+# Server runs on http://localhost:5000 with Socket.IO
+# Uses in-memory MongoDB if MONGODB_URI is unreachable
 ```
 
 **Terminal 2 - Frontend:**
 ```bash
-cd frontend
-npm run dev
+npm run dev:frontend
 # Application runs on http://localhost:3000
+```
+
+### Testing Real-time Notifications
+
+```bash
+# In a separate terminal, with backend running:
+node backend/scripts/testNotify.js
+# Connects as client and creates a test notification
+```
+
+### Running API Tests
+
+```bash
+npm run test:api
+# Runs Postman collection with Newman
+# Tests: auth, notifications, messages, follows
+# Generates test report in test-results.json
 ```
 
 ### Production Build
 
 **Backend:**
 ```bash
-cd backend
-npm run build
-npm start
+npm run build:backend
+npm run start:backend
 ```
 
 **Frontend:**
 ```bash
-cd frontend
-npm run build
-npm start
+npm run build:frontend
+npm run start:frontend
 ```
+
+## 🔔 Real-time Notifications (v2.0)
+
+### Notification Types
+- `user_followed` - When you're followed
+- `post_liked` - When your post is liked
+- `post_commented` - When someone comments on your post
+- `new_message` - When you receive a direct message
+- `course_started` - When a student enrolls (for instructors)
+- `achievement_unlocked` - When you earn an achievement
+- `course_review` - When your course gets reviewed
+
+### Architecture
+- **Backend:** Socket.IO server with JWT authentication
+- **Frontend:** Socket.IO client auto-connects with user token
+- **Storage:** MongoDB persistence + real-time push
+
+### Testing Notifications
+See [SYSTEM_STATUS.md](SYSTEM_STATUS.md) for testing guide.
+
+---
+
+## 🚀 Deployment
+
+### Quick Deploy to Vercel
+
+**Prerequisites:**
+- GitHub account with code pushed
+- Vercel account (https://vercel.com)
+- Environment variables configured
+
+**Steps:**
+1. Push to GitHub (see below)
+2. Go to https://vercel.com/new
+3. Import your GitHub repo
+4. Set environment variables:
+   - `MONGODB_URI` - Your MongoDB connection string
+   - `JWT_SECRET` - Secret key for JWT tokens
+   - `FRONTEND_URL` - Your frontend URL
+   - `BACKEND_URL` - Your backend API URL
+5. Deploy!
+
+**GitHub Push & Auto-Deploy:**
+```bash
+# Ensure git is configured
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+
+# Commit and push
+git add .
+git commit -m "feat: realtime notifications + CI/CD pipeline"
+git push origin main
+```
+
+For complete deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+---
 
 ## API Documentation
 
@@ -262,6 +341,30 @@ vercel
 **AWS/DigitalOcean:**
 - Deploy backend to EC2/Droplet
 - Deploy frontend to S3/CloudFront
+
+## Testing & CI/CD
+
+### Automated API Tests
+```bash
+npm run test:api
+```
+Uses Postman collection with Newman to test all major endpoints.
+
+### GitHub Actions
+Automatically:
+- Builds backend (TypeScript)
+- Builds frontend (Next.js)
+- Lints both projects
+- Deploys to Vercel on main branch
+
+See `.github/workflows/ci-cd.yml` for workflow details.
+
+### Test Files
+- `postman_collection.json` - API endpoint tests
+- `newman-test.js` - Test runner script
+- `backend/scripts/testNotify.js` - Real-time notification test
+
+---
 
 ## Contributing
 

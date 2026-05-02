@@ -59,11 +59,12 @@ export const messageController = {
 
       try {
         const { notificationController } = require('./notificationController');
+        const senderUsername = (message.sender as any)?.username || 'Someone';
         notificationController.createNotification(
           receiverId,
           'new_message',
           'New message',
-          `${message.sender?.username || 'Someone'} sent you a message: ${String(message.content).slice(0, 120)}`,
+          `${senderUsername} sent you a message: ${String(message.content).slice(0, 120)}`,
           (req as any).user.userId,
           { type: 'message', id: message._id },
           'high'

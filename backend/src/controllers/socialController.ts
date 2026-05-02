@@ -64,6 +64,27 @@ export const socialController = {
       }
 
       await post.save();
+
+      try {
+        const { notificationController } = require('./notificationController');
+        const userId = (req as any).user.userId;
+        const author = post.author as any;
+        if (likeIndex === -1 && author && author.toString() !== userId) {
+          const userDoc = await User.findById(userId);
+          notificationController.createNotification(
+            String(author),
+            'post_liked',
+            'Your post got a like',
+            `${userDoc?.username || 'Someone'} liked your post`,
+            userId,
+            { type: 'post', id: post._id },
+            'normal'
+          );
+        }
+      } catch (err) {
+        console.error('Failed to send like notification:', err);
+      }
+
       return res.json(ApiResponse.success(post, 'Post liked/unliked'));
     } catch (error: any) {
       return res.status(500).json(ApiResponse.error('Failed to like post', error));
@@ -88,6 +109,26 @@ export const socialController = {
 
       await post.save();
       await post.populate('comments.author', 'username firstName lastName avatar');
+
+      try {
+        const { notificationController } = require('./notificationController');
+        const userId = (req as any).user.userId;
+        const author = post.author as any;
+        const userDoc = await User.findById(userId);
+        if (author && author.toString() !== userId) {
+          notificationController.createNotification(
+            String(author),
+            'post_commented',
+            'New comment on your post',
+            `${userDoc?.username || 'Someone'} commented: ${String(content).slice(0, 100)}`,
+            userId,
+            { type: 'post', id: post._id },
+            'normal'
+          );
+        }
+      } catch (err) {
+        console.error('Failed to send comment notification:', err);
+      }
 
       return res.json(ApiResponse.success(post, 'Comment added'));
     } catch (error: any) {

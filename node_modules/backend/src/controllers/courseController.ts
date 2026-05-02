@@ -87,6 +87,26 @@ export const courseController = {
       course.enrollmentCount += 1;
       await course.save();
 
+      try {
+        const User = require('../models/User').default;
+        const { notificationController } = require('./notificationController');
+        const userDoc = await User.findById(userId);
+        const instructorId = course.instructor as any;
+        if (instructorId) {
+          notificationController.createNotification(
+            String(instructorId),
+            'course_started',
+            'Student enrolled in your course',
+            `${userDoc?.username || 'Someone'} enrolled in your course: ${course.title}`,
+            userId,
+            { type: 'course', id: course._id },
+            'normal'
+          );
+        }
+      } catch (err) {
+        console.error('Failed to send enrollment notification:', err);
+      }
+
       return res.json(ApiResponse.success(course, 'Enrolled successfully'));
     } catch (error: any) {
       return res.status(500).json(ApiResponse.error('Failed to enroll', error));
