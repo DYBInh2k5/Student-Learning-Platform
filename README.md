@@ -10,6 +10,7 @@ A full-stack educational social network platform where students can learn progra
 - 💬 **Social Features** - Post updates, comment on posts, and build community
 - 💌 **Real-time Messaging** - Send instant messages with Socket.io
 - 🔔 **Real-time Notifications** - Instant push notifications for all events (new in v2.0)
+- 📈 **Community Stats** - Homepage showcases live community growth and engagement metrics
 - 🏆 **Gamification** - Earn points and badges for achievements
 - 👥 **User Management** - Profiles, follower system, role-based access
 

@@ -21,13 +21,6 @@
       "dest": "frontend/.next/($1)"
     }
   ],
-  "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "FRONTEND_URL": "https://student-platform.vercel.app",
-    "BACKEND_URL": "https://student-platform-api.vercel.app",
-    "NODE_ENV": "production"
-  },
   "projectSettings": {
     "sourceFilesOutsideRootDirectory": true
   }

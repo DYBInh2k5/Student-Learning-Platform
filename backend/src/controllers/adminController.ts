@@ -5,31 +5,57 @@ import Post from '../models/Post';
 import Message from '../models/Message';
 import { ApiResponse } from '../utils/response';
 
+const buildCommunityStats = async () => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const [users, courses, posts, messages, newUsers, newPosts, newMessages] = await Promise.all([
+    User.countDocuments(),
+    Course.countDocuments(),
+    Post.countDocuments(),
+    Message.countDocuments(),
+    User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+    Post.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+    Message.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+  ]);
+
+  return {
+    users,
+    courses,
+    posts,
+    messages,
+    newUsers,
+    newPosts,
+    newMessages,
+    communityMomentum: users + posts + messages + courses,
+  };
+};
+
 export const adminController = {
   getDashboardStats: async (_req: Request, res: Response) => {
     try {
-      const [users, courses, posts, messages] = await Promise.all([
-        User.countDocuments(),
-        Course.countDocuments(),
-        Post.countDocuments(),
-        Message.countDocuments(),
-      ]);
-
+      const stats = await buildCommunityStats();
       const usersByRole = await User.aggregate([
         { $group: { _id: '$role', count: { $sum: 1 } } },
       ]);
 
       return res.json(
         ApiResponse.success({
-          users,
-          courses,
-          posts,
-          messages,
+          ...stats,
           usersByRole,
         })
       );
     } catch (error: any) {
       return res.status(500).json(ApiResponse.error('Failed to fetch admin stats', error));
+    }
+  },
+
+  getPublicStats: async (_req: Request, res: Response) => {
+    try {
+      const stats = await buildCommunityStats();
+      return res.json(ApiResponse.success(stats, 'Community stats fetched'));
+    } catch (error: any) {
+      return res.status(500).json(ApiResponse.error('Failed to fetch community stats', error));
     }
   },
 
